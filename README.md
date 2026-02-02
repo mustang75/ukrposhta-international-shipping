@@ -154,13 +154,13 @@ http://localhost:5000
 ## Getting API Credentials / Отримання API ключів
 
 ### English
-1. Register at [Ukrposhta Business](https://www.ukrposhta.ua/ua/biznes-klijentam)
+1. Register at [Ukrposhta Business](https://www.ukrposhta.ua/ua/ukrposhta-dlia-biznesu)
 2. Sign agreement for API access
 3. Get your tokens from the manager
 4. Documentation: [dev.ukrposhta.ua](https://dev.ukrposhta.ua/documentation)
 
 ### Українська
-1. Зареєструйтесь на [Укрпошта для бізнесу](https://www.ukrposhta.ua/ua/biznes-klijentam)
+1. Зареєструйтесь на [Укрпошта для бізнесу](https://www.ukrposhta.ua/ua/ukrposhta-dlia-biznesu)
 2. Підпишіть договір на доступ до API
 3. Отримайте токени від менеджера
 4. Документація: [dev.ukrposhta.ua](https://dev.ukrposhta.ua/documentation)
