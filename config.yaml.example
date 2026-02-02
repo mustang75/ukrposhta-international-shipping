@@ -1,0 +1,20 @@
+environment: production   # production | sandbox
+
+ukrposhta:
+  production:
+    base_url: "https://www.ukrposhta.ua"
+    bearer_ecom: "YOUR_BEARER_ECOM_TOKEN"
+    bearer_status: "YOUR_BEARER_STATUS_TOKEN"
+    counterparty_token: "YOUR_COUNTERPARTY_TOKEN"
+    counterparty_uuid: "YOUR_COUNTERPARTY_UUID"
+
+  sandbox:
+    base_url: "https://dev.ukrposhta.ua"
+    bearer_ecom: "YOUR_SANDBOX_BEARER_ECOM"
+    bearer_status: "YOUR_SANDBOX_BEARER_STATUS"
+    counterparty_token: "YOUR_SANDBOX_COUNTERPARTY_TOKEN"
+    counterparty_uuid: "YOUR_SANDBOX_COUNTERPARTY_UUID"
+
+export:
+  page_limit: 50
+  output_csv: "recipients.csv"
