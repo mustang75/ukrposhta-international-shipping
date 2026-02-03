@@ -294,10 +294,12 @@ def get_shipments_list(limit: int = 50, offset: int = 0) -> dict:
             if tracking.get("success") and tracking.get("data"):
                 statuses = tracking["data"]
                 if isinstance(statuses, list) and len(statuses) > 0:
-                    new_status = statuses[0].get("eventName", s.get("status"))
+                    # Get the LAST status (most recent) - statuses are in chronological order
+                    latest = statuses[-1]
+                    new_status = latest.get("eventName", s.get("status"))
                     if new_status and new_status != s.get("status"):
                         s["status"] = new_status
-                        s["lastUpdate"] = statuses[0].get("date")
+                        s["lastUpdate"] = latest.get("date")
                         updated = True
 
     # Save updated statuses back to file
