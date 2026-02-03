@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>International postage | UKRPOSHTA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="#" class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40">
+                    <circle cx="20" cy="20" r="18" fill="#ffcc00"/>
+                    <text x="20" y="26" text-anchor="middle" font-size="14" font-weight="bold" fill="#1a5276">UP</text>
+                </svg>
+                <span class="logo-text">UKRPOSHTA</span>
+            </a>
+            <nav class="nav-tabs">
+                <button class="nav-tab" onclick="showTab('shipments')">My shipments</button>
+                <button class="nav-tab active" onclick="showTab('create')">Create shipment</button>
+                <button class="nav-tab" onclick="showTab('track')">Track shipment</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="page-title">
+            <h1>International postage</h1>
+        </div>
+
+        <!-- Shipments List Tab -->
+        <div id="shipments-content" class="content">
+            <div class="info-box" style="background:#fff3cd; border-color:#ffc107; color:#856404;">
+                <strong>IMPORTANT INFORMATION</strong><br>
+                &bull; Shipping to the USA: Stable Delivery Times Ahead of the Holiday Season<br>
+                &bull; Find out about new international shipping rates starting January 1, 2026.<br>
+                Please follow the news on the e-export portal.
+            </div>
+
+            <div class="content-tabs">
+                <button class="content-tab active" onclick="showSubTab('list')">List of shipments</button>
+                <button class="content-tab" onclick="showSubTab('shipment')">Shipment</button>
+            </div>
+
+            <div id="list-subtab">
+                <div class="warning-box" style="margin-bottom:20px;">
+                    <strong>Note:</strong> Due to Ukrposhta security policy, shipments created via personal account (ok.ukrposhta.ua)
+                    are NOT accessible via API. You can import them manually by barcode below.
+                </div>
+
+                <div class="form-row" style="margin-bottom: 20px; align-items:flex-end;">
+                    <div class="form-group" style="flex:2;">
+                        <label>Import existing shipment by barcode:</label>
+                        <div style="display:flex; gap:10px;">
+                            <input type="text" id="importBarcode" placeholder="e.g. LO060405586UA" style="flex:1;">
+                            <button class="btn btn-secondary" onclick="importShipment()">Import</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Filter by type:</label>
+                        <select id="filterType" style="max-width:200px;">
+                            <option value="">All shipments</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="importResult" style="margin-bottom:15px;"></div>
+
+                <div style="overflow-x:auto;">
+                    <table class="shipments-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Shipment number</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Recipient name</th>
+                                <th>Recipient phone</th>
+                                <th>Recipient address</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shipmentsTableBody">
+                            <tr>
+                                <td colspan="8" style="text-align:center; padding:40px; color:#666;">
+                                    No shipments yet. Click "Create shipment" tab to add a new international shipment.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="shipment-subtab" style="display:none;">
+                <p style="color:#666; text-align:center; padding:40px;">
+                    Select a shipment from the list to view details.
+                </p>
+            </div>
+        </div>
+
+        <!-- Create Shipment Tab -->
+        <div id="create-content" class="content active">
+            <h2 class="section-title" style="font-size:1.3rem; margin-bottom:20px;">Create shipment</h2>
+            <div class="info-box" style="background:#fff3cd; border-color:#ffc107; color:#856404;">
+                Dear customer, if you don't see addresses to choose from in the drop-down list, you must:
+                <ul style="margin:10px 0 0 20px;">
+                    <li>Go to "User profile"</li>
+                    <li>Click the "Add address" button</li>
+                    <li>Fill out the form that appears, correctly choose the type of shipments you plan to make (within Ukraine or international)</li>
+                    <li>Save the address</li>
+                    <li>Go back to creating a shipment</li>
+                </ul>
+            </div>
+
+            <form id="shipmentForm" onsubmit="createShipment(event)">
+                <!-- Shipment Type -->
+                <div class="form-section">
+                    <h3 class="section-title">Shipment Type</h3>
+                    <div class="form-group">
+                        <label>Select type: <span class="required">*</span></label>
+                        <select name="shipmentType" id="shipmentType" required onchange="onShipmentTypeChange()">
+                            <option value="">-- Select shipment type --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Sender -->
+                <div class="form-section">
+                    <h3 class="section-title">Sender</h3>
+                    <div class="sender-info">
+                        <p><strong id="senderName">{{ sender.name }}</strong></p>
+                        <p>Address: <strong id="senderAddress">{{ sender.address }}</strong></p>
+                    </div>
+                    <p style="color: #17a2b8; font-size: 0.9rem;">All data must be entered with latin characters</p>
+                </div>
+
+                <!-- Recipient -->
+                <div class="form-section">
+                    <h3 class="section-title">Recipient</h3>
+
+                    <div class="radio-group">
+                        <label><input type="radio" name="recipientType" value="INDIVIDUAL" checked> Individual</label>
+                        <label><input type="radio" name="recipientType" value="LEGAL_ENTITY"> Legal entity</label>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Country: <span class="required">*</span></label>
+                            <select name="country" id="countrySelect" required onchange="onCountryChange()">
+                                <option value="">-- Select country --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Last name and First name: <span class="required">*</span></label>
+                            <input type="text" name="fullName" placeholder="Last name and First name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>E-mail:</label>
+                            <input type="email" name="email" placeholder="E-mail">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone: <span class="required">*</span></label>
+                            <div class="input-with-addon">
+                                <select name="phoneCode" id="phoneCode" style="width: 100px;">
+                                    <option value="+1">+1</option>
+                                </select>
+                                <input type="tel" name="phone" placeholder="Phone number" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recipient Address -->
+                <div class="form-section">
+                    <h3 class="section-title">Recipient address</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Region/State:</label>
+                            <input type="text" name="region" placeholder="Region/State">
+                        </div>
+                        <div class="form-group">
+                            <label>Zip code:</label>
+                            <input type="text" name="zipCode" placeholder="Zip code">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>City: <span class="required">*</span></label>
+                            <input type="text" name="city" placeholder="City" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Address: <span class="required">*</span></label>
+                            <input type="text" name="address" placeholder="Address" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipment Information -->
+                <div class="form-section">
+                    <h3 class="section-title">Information about shipment</h3>
+                    <div class="info-box" id="shipmentTypeInfo">
+                        Shipment type: <strong>Not selected</strong>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Gross weight, g: <span class="required">*</span></label>
+                            <input type="number" name="weight" id="weightInput" min="1" max="30000" placeholder="Gross weight, g" required onchange="updatePrice()">
+                        </div>
+                        <div class="form-group">
+                            <label>Length, cm: <span class="required">*</span></label>
+                            <input type="number" name="length" min="1" value="20" placeholder="Length, cm" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Width, cm: <span class="required">*</span></label>
+                            <input type="number" name="width" min="1" value="15" placeholder="Width, cm" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Height, cm: <span class="required">*</span></label>
+                            <input type="number" name="height" min="1" value="10" placeholder="Height, cm" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attachments -->
+                <div class="form-section">
+                    <h3 class="section-title">Attachment info</h3>
+                    <div id="attachmentsContainer">
+                        <div class="attachment-card" data-index="0">
+                            <div class="attachment-header">
+                                <h4>Attachment</h4>
+                                <button type="button" class="btn-remove-attachment" onclick="removeAttachment(this)" style="display:none;">Delete attachment</button>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>CNFEA code (HS Code): <span class="required">*</span></label>
+                                    <div class="autocomplete-wrapper">
+                                        <input type="text" name="hsCode[]" class="hs-code-input" placeholder="Enter code or name (e.g. 6109100000 or T-shirt)" required autocomplete="off">
+                                        <div class="autocomplete-dropdown"></div>
+                                    </div>
+                                    <div class="hs-selected-info"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Detailed description of the attachment EN: <span class="required">*</span></label>
+                                    <input type="text" name="description[]" class="hs-description" placeholder="e.g. Cotton T-Shirt" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Cost of attachment (for tax declaration): <span class="required">*</span></label>
+                                    <div class="input-with-addon">
+                                        <input type="number" name="itemCost[]" min="0" step="0.01" placeholder="Cost of attachment" required style="flex:1;">
+                                        <select name="itemCurrency[]">
+                                            <option value="UAH">UAH</option>
+                                            <option value="USD">USD</option>
+                                            <option value="EUR">EUR</option>
+                                            <option value="GBP">GBP</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Number of units, unit: <span class="required">*</span></label>
+                                    <input type="number" name="itemQty[]" min="1" value="1" placeholder="Number of units, unit" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Unpackaged attachment weight, g: <span class="required">*</span></label>
+                                    <input type="number" name="itemWeight[]" min="1" placeholder="Unpackaged attachment weight, g" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Attachment's country of origin: <span class="required">*</span></label>
+                                    <select name="itemOrigin[]" required>
+                                        <option value="UA" selected>Ukraine</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-outline" onclick="addAttachment()">Add attachment</button>
+
+                    <div class="warning-box" style="margin-top: 20px;">
+                        According to the changes in the customs legislation of Ukraine, aimed at compliance with world standards, the "HS Code" field
+                        is mandatory. We are already asking you to independently define and specify the
+                        commodity code of the attachment (at least 6 digits without punctuation marks and spaces) according to international
+                        standards. You can use the <a href="https://www.wcoomd.org/en/topics/nomenclature/instrument-and-tools/hs-nomenclature-2022-edition.aspx" target="_blank">Harmonized System database</a>
+                        by the World Customs Organization.
+                    </div>
+                </div>
+
+                <!-- Customs Information -->
+                <div class="form-section">
+                    <h3 class="section-title">Information for customs declarations</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Shipment category: <span class="required">*</span></label>
+                            <select name="category" required>
+                                <option value="">-- Select category --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Information for EU customs:</label>
+                            <input type="text" name="euInfo" placeholder="Additional info for EU customs">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Display -->
+                <div class="price-display" id="priceDisplay" style="display:none;">
+                    Estimated shipping cost: <strong id="priceValue">-</strong>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-danger" onclick="resetForm()">Cancel</button>
+                    <button type="button" class="btn btn-secondary" onclick="calculatePrice()">Calculate</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Save</button>
+                </div>
+            </form>
+
+            <div id="shipmentResult" style="margin-top: 20px;"></div>
+        </div>
+
+        <!-- Track Tab -->
+        <div id="track-content" class="content">
+            <h3 class="section-title">Enter tracking number</h3>
+            <div class="tracking-input">
+                <input type="text" id="barcodeInput" placeholder="e.g. RR123456789UA" onkeypress="if(event.key==='Enter') trackShipment()">
+                <button class="btn btn-primary" onclick="trackShipment()">Track</button>
+            </div>
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">
+                Enter one or more tracking numbers (separated by comma or space). Maximum 50 shipments.
+            </p>
+            <div id="trackResults"></div>
+        </div>
+    </main>
+
+    <!-- Data from server -->
+    <script>
+        const countries = {{ countries | tojson }};
+        const shipmentTypes = {{ shipment_types | tojson }};
+        const categories = {{ categories | tojson }};
+        const sender = {{ sender | tojson }};
+        const hsCodes = {{ hs_codes | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

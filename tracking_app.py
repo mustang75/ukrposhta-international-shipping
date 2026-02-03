@@ -2220,13 +2220,13 @@ HTML_TEMPLATE = '''
 
 @app.route('/')
 def index():
-    import json
-    html = HTML_TEMPLATE.replace('COUNTRIES_JSON', json.dumps(COUNTRIES))
-    html = html.replace('SHIPMENT_TYPES_JSON', json.dumps(SHIPMENT_TYPES))
-    html = html.replace('CATEGORIES_JSON', json.dumps(SHIPMENT_CATEGORIES))
-    html = html.replace('SENDER_JSON', json.dumps(SENDER))
-    html = html.replace('HS_CODES_JSON', json.dumps(HS_CODES))
-    return html
+    return render_template('index.html',
+        countries=COUNTRIES,
+        shipment_types=SHIPMENT_TYPES,
+        categories=SHIPMENT_CATEGORIES,
+        sender=SENDER,
+        hs_codes=HS_CODES
+    )
 
 
 @app.route('/api/track', methods=['POST'])
@@ -2386,6 +2386,30 @@ def api_create_shipment():
     if requires_avia:
         international_data["transportType"] = "AVIA"
 
+    # Calculate declared value in UAH (sum of all items' value converted to UAH)
+    # Exchange rates (approximate)
+    exchange_rates = {"UAH": 1, "USD": 41, "EUR": 44, "GBP": 51}
+    total_declared_value = 0
+    for item in parcel_items:
+        item_value = item.get("value", 0) * item.get("quantity", 1)
+        currency = item.get("currency", "USD")
+        rate = exchange_rates.get(currency, 41)  # Default to USD rate
+        total_declared_value += item_value * rate
+
+    # Build parcel object
+    parcel_data = {
+        "weight": data["package"]["weight"],
+        "length": data["package"].get("length", 10),
+        "width": data["package"].get("width", 10),
+        "height": data["package"].get("height", 10),
+        "parcelItems": parcel_items  # Use parcelItems, not items!
+    }
+
+    # Add declaredPrice only for package types that support it
+    # SMALL_BAG (дрібний пакет) does NOT support declared value according to Ukrposhta docs
+    if package_type not in ["SMALL_BAG", "LETTER"]:
+        parcel_data["declaredPrice"] = total_declared_value
+
     shipment_data = {
         "sender": {"uuid": sender["uuid"]},
         "recipient": {"uuid": recipient_uuid},
@@ -2399,13 +2423,7 @@ def api_create_shipment():
         "packageType": package_type,
         "international": True,  # Required for international shipments
         "internationalData": international_data,
-        "parcels": [{
-            "weight": data["package"]["weight"],
-            "length": data["package"].get("length", 10),
-            "width": data["package"].get("width", 10),
-            "height": data["package"].get("height", 10),
-            "parcelItems": parcel_items  # Use parcelItems, not items!
-        }]
+        "parcels": [parcel_data]
     }
 
     result = create_shipment(shipment_data)
