@@ -200,11 +200,14 @@ http://localhost:5000
 The application includes a database of common HS codes (UKTZED - Ukrainian customs classification).
 Додаток містить базу популярних кодів УКТЗЕД для митного оформлення.
 
-HS codes must be 10 digits / Коди повинні бути 10-значними:
-- `6109100000` - T-shirts, cotton / Футболки бавовняні
-- `9006590000` - Film cameras / Плівкові фотоапарати
-- `8517120000` - Smartphones / Смартфони
-- `9503009000` - Toys / Іграшки
+HS codes are 6 digits internationally (countries add extra digits for national classification):
+
+Коди HS - 6 цифр міжнародно (країни додають цифри для національної класифікації):
+
+- `6109.10` - T-shirts, cotton / Футболки бавовняні
+- `8517.13` - Smartphones / Смартфони
+- `9503.00` - Toys / Іграшки
+- `9006.53` - Digital cameras / Цифрові фотоапарати
 
 Full list / Повний список: [WCO Harmonized System](https://www.wcotradetools.org/en/harmonized-system)
 
@@ -229,8 +232,8 @@ CREATED → REGISTERED → IN_TRANSIT → DELIVERED
 
 ## Troubleshooting / Вирішення проблем
 
-### "HS code not found" / "Код УКТЗЕД не знайдено"
-- Use 10-digit UKTZED codes / Використовуйте 10-значні коди
+### "HS code not found" / "Код HS не знайдено"
+- Use 6-digit HS codes / Використовуйте 6-значні коди HS
 - Search by product name / Шукайте за назвою товару
 - Reference / Довідка: [WCO Harmonized System](https://www.wcotradetools.org/en/harmonized-system)
 
