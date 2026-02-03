@@ -206,7 +206,7 @@ HS codes must be 10 digits / Коди повинні бути 10-значним�
 - `8517120000` - Smartphones / Смартфони
 - `9503009000` - Toys / Іграшки
 
-Full list: [ukrstat.gov.ua](https://ukrstat.gov.ua/klasf/klasif/uktzed.htm)
+Full list / Повний список: [WCO Harmonized System](https://www.wcotradetools.org/en/harmonized-system)
 
 ---
 
@@ -232,7 +232,7 @@ CREATED → REGISTERED → IN_TRANSIT → DELIVERED
 ### "HS code not found" / "Код УКТЗЕД не знайдено"
 - Use 10-digit UKTZED codes / Використовуйте 10-значні коди
 - Search by product name / Шукайте за назвою товару
-- Reference: [ukrstat.gov.ua](https://ukrstat.gov.ua/klasf/klasif/uktzed.htm)
+- Reference / Довідка: [WCO Harmonized System](https://www.wcotradetools.org/en/harmonized-system)
 
 ### "latinName should not be empty"
 - Add `latinName` field to sender / Додайте поле latinName
