@@ -158,11 +158,19 @@ def get_shipment_label(shipment_uuid: str, label_type: str = "forms") -> bytes:
     url = f"{env_cfg['base_url']}/forms/ecom/0.0.1/international/shipments/{shipment_uuid}/{label_type}"
     headers = {"Authorization": f"Bearer {env_cfg['bearer_ecom']}"}
     params = {"token": env_cfg["counterparty_token"]}
-    resp = requests.get(url, headers=headers, params=params, timeout=30)
-    if resp.status_code == 200:
-        return resp.content
-    print(f"Label error: {resp.status_code} - {resp.text[:200]}")
-    return None
+    try:
+        # Increased timeout for PDF generation (can be slow)
+        resp = requests.get(url, headers=headers, params=params, timeout=60)
+        if resp.status_code == 200:
+            return resp.content
+        print(f"Label error: {resp.status_code} - {resp.text[:200]}")
+        return None
+    except requests.exceptions.Timeout:
+        print(f"Label timeout: Ukrposhta server did not respond in time")
+        return None
+    except requests.exceptions.RequestException as e:
+        print(f"Label request error: {e}")
+        return None
 
 
 def delete_shipment(shipment_uuid: str) -> dict:
@@ -2467,7 +2475,7 @@ def api_get_label(shipment_uuid):
     if pdf_data:
         return Response(pdf_data, mimetype='application/pdf',
                        headers={'Content-Disposition': f'attachment; filename=label_{shipment_uuid}_{label_type}.pdf'})
-    return jsonify({"success": False, "error": "Could not generate label. Make sure shipment UUID is correct."})
+    return jsonify({"success": False, "error": "Could not generate label. Ukrposhta server may be slow - please try again."}), 503
 
 
 @app.route('/api/shipment-types')
