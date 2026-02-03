@@ -690,7 +690,8 @@ function displayTrackResults(data, barcodes) {
     });
 
     for (const [barcode, statuses] of Object.entries(shipments)) {
-        const lastStatus = statuses[0];
+        // Get the latest status (last in array)
+        const lastStatus = statuses[statuses.length - 1];
         const statusClass = getTrackStatusClass(lastStatus);
         const statusText = getTrackStatusText(lastStatus);
 
@@ -703,7 +704,8 @@ function displayTrackResults(data, barcodes) {
                 <div class="timeline">
         `;
 
-        statuses.forEach(status => {
+        // Reverse to show newest first
+        [...statuses].reverse().forEach(status => {
             html += `
                 <div class="timeline-item">
                     <div class="timeline-date">${formatDate(status.date)}</div>
