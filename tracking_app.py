@@ -2406,8 +2406,8 @@ def api_create_shipment():
     }
 
     # Add declaredPrice only for package types that support it
-    # SMALL_BAG (дрібний пакет) does NOT support declared value according to Ukrposhta docs
-    if package_type not in ["SMALL_BAG", "LETTER"]:
+    # Only PARCEL and DECLARED_VALUE can have declared price according to Ukrposhta API
+    if package_type in ["PARCEL", "DECLARED_VALUE"]:
         parcel_data["declaredPrice"] = total_declared_value
 
     shipment_data = {
