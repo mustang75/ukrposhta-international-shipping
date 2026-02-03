@@ -258,7 +258,7 @@ function updateShipmentsTable() {
             <td>
                 <a href="/api/label/${s.uuid}" class="btn-icon btn-icon-download" target="_blank" title="Download label">📥</a>
                 <button class="btn-icon btn-icon-view" onclick="viewShipmentDetails('${s.uuid}')" title="View details">👁</button>
-                <button class="btn-icon" onclick="deleteShipment('${s.uuid}')" title="Delete shipment" style="color:#c0392b;">🗑</button>
+                ${s.status === 'CREATED' ? `<button class="btn-icon" onclick="deleteShipment('${s.uuid}')" title="Delete shipment" style="color:#c0392b;">🗑</button>` : ''}
             </td>
         </tr>
     `}).join('');
@@ -317,7 +317,7 @@ async function viewShipmentDetails(uuid) {
                     <div style="margin-top:20px;">
                         <a href="/api/label/${s.uuid}" class="btn btn-secondary" target="_blank">Download Label (PDF)</a>
                         <button class="btn btn-outline" onclick="trackByBarcode('${s.barcode}')" style="margin-left:10px;">Track</button>
-                        <button class="btn" onclick="deleteShipment('${s.uuid}')" style="margin-left:10px; background:#c0392b; color:white;">Delete</button>
+                        ${s.status === 'CREATED' ? `<button class="btn" onclick="deleteShipment('${s.uuid}')" style="margin-left:10px; background:#c0392b; color:white;">Delete</button>` : ''}
                     </div>
                 </div>
             `;
