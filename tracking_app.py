@@ -261,6 +261,7 @@ def save_shipment_locally(shipment: dict, group_uuid: str = None):
 def get_shipments_list(limit: int = 50, offset: int = 0) -> dict:
     """Get list of shipments - combines local storage with API tracking"""
     shipments = load_local_data(SHIPMENTS_FILE)
+    updated = False
 
     # Update status for each shipment via tracking API
     for s in shipments[:20]:  # Only update first 20 for performance
@@ -269,8 +270,15 @@ def get_shipments_list(limit: int = 50, offset: int = 0) -> dict:
             if tracking.get("success") and tracking.get("data"):
                 statuses = tracking["data"]
                 if isinstance(statuses, list) and len(statuses) > 0:
-                    s["status"] = statuses[0].get("eventName", s.get("status"))
-                    s["lastUpdate"] = statuses[0].get("date")
+                    new_status = statuses[0].get("eventName", s.get("status"))
+                    if new_status and new_status != s.get("status"):
+                        s["status"] = new_status
+                        s["lastUpdate"] = statuses[0].get("date")
+                        updated = True
+
+    # Save updated statuses back to file
+    if updated:
+        save_local_data(SHIPMENTS_FILE, shipments)
 
     return {"success": True, "data": shipments[offset:offset+limit]}
 
