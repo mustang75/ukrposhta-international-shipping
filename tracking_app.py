@@ -249,12 +249,36 @@ def save_local_data(filename: str, data: list):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+def cleanup_old_shipments(shipments: list, max_age_days: int = 120) -> list:
+    """Remove shipments older than max_age_days (default 4 months = 120 days)"""
+    from datetime import timedelta
+    cutoff_date = datetime.now() - timedelta(days=max_age_days)
+
+    cleaned = []
+    for s in shipments:
+        # Check saved_at or created date
+        date_str = s.get("saved_at") or s.get("created")
+        if date_str:
+            try:
+                shipment_date = datetime.fromisoformat(date_str.replace("Z", "+00:00").split("+")[0])
+                if shipment_date >= cutoff_date:
+                    cleaned.append(s)
+            except:
+                cleaned.append(s)  # Keep if date parsing fails
+        else:
+            cleaned.append(s)  # Keep if no date
+
+    return cleaned
+
+
 def save_shipment_locally(shipment: dict, group_uuid: str = None):
     """Save shipment to local file"""
     shipments = load_local_data(SHIPMENTS_FILE)
     shipment["group_uuid"] = group_uuid
     shipment["saved_at"] = datetime.now().isoformat()
     shipments.insert(0, shipment)
+    # Cleanup old shipments (older than 4 months) and limit to 200
+    shipments = cleanup_old_shipments(shipments)
     save_local_data(SHIPMENTS_FILE, shipments[:200])
 
 
