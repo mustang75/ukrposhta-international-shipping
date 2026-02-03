@@ -1,24 +1,9 @@
 /**
  * Ukrposhta International Shipping - Application JavaScript
+ *
+ * Note: The following variables are defined in index.html before this script loads:
+ * - countries, shipmentTypes, categories, sender, hsCodes
  */
-
-// Data will be injected from template
-let countries = [];
-let shipmentTypes = [];
-let categories = [];
-let sender = {};
-let hsCodes = [];
-
-// Initialize application with server data
-function initApp(data) {
-    countries = data.countries || [];
-    shipmentTypes = data.shipmentTypes || [];
-    categories = data.categories || [];
-    sender = data.sender || {};
-    hsCodes = data.hsCodes || [];
-
-    initializeForm();
-}
 
 // Initialize form elements
 function initializeForm() {
@@ -760,6 +745,9 @@ function formatDate(dateStr) {
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize form with data from server
+    initializeForm();
+
     const filterType = document.getElementById('filterType');
     if (filterType) {
         filterType.addEventListener('change', updateShipmentsTable);
