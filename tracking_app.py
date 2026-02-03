@@ -451,11 +451,11 @@ def get_or_create_sender() -> dict:
 # ==================== SHIPMENT TYPES ====================
 
 SHIPMENT_TYPES = [
-    {"code": "PRIME", "name": "PRIME (Експрес міжнародний)", "maxWeight": 30000, "calcType": "PRIME", "packageType": "PRIME", "requiresTracked": True, "requiresAvia": True},
+    {"code": "PRIME", "name": "PRIME (Дрібний пакет)", "maxWeight": 5000, "calcType": "PRIME", "packageType": "PRIME", "requiresTracked": True, "requiresAvia": True},
     {"code": "SMALL_BAG", "name": "Small bag (Мале відправлення)", "maxWeight": 2000, "calcType": "SMALL_PACKAGE", "packageType": "SMALL_BAG"},
     {"code": "PARCEL", "name": "Parcel (Посилка)", "maxWeight": 30000, "calcType": "PARCEL", "packageType": "PARCEL"},
     {"code": "EMS", "name": "EMS Express", "maxWeight": 30000, "calcType": "EMS", "packageType": "EMS"},
-    {"code": "LETTER", "name": "Letter (Лист)", "maxWeight": 500, "calcType": "LETTER", "packageType": "LETTER"},
+    {"code": "LETTER", "name": "Letter (Лист)", "maxWeight": 2000, "calcType": "LETTER", "packageType": "LETTER"},
 ]
 
 # ==================== SHIPMENT CATEGORIES ====================

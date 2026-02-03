@@ -185,13 +185,13 @@ http://localhost:5000
 
 ## Supported Shipment Types / Типи відправлень
 
-| Type | Description | Max Weight |
-|------|-------------|------------|
-| PRIME | Express International / Експрес міжнародний | 30 kg |
-| PARCEL | International Parcel / Міжнародна посилка | 30 kg |
-| EMS | EMS Express | 30 kg |
-| SMALL_BAG | Small Package / Мале відправлення | 2 kg |
-| LETTER | International Letter / Міжнародний лист | 500 g |
+| Type | Description | Max Weight | Notes |
+|------|-------------|------------|-------|
+| PRIME | Small packet PRIME / Дрібний пакет PRIME | 5 kg | Pre-registered online only. 2 kg standard, up to 5 kg for UK, China, Singapore, India |
+| SMALL_BAG | Small packet / Дрібний пакет | 2 kg | With personal delivery + refund |
+| PARCEL | International Parcel / Міжнародна посилка | 30 kg | With personal delivery + refund |
+| EMS | EMS Express | 30 kg | Express delivery with increased refund |
+| LETTER | International Letter / Міжнародний лист | 2 kg | Ordinary or registered |
 
 ---
 
