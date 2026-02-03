@@ -249,7 +249,7 @@ function updateShipmentsTable() {
         return `
         <tr>
             <td>${i + 1}</td>
-            <td><span class="barcode">${s.barcode || '-'}</span></td>
+            <td><span class="barcode barcode-link" onclick="trackByBarcode('${s.barcode}')" title="Click to track">${s.barcode || '-'}</span></td>
             <td>${formattedDate}</td>
             <td><span class="status-badge-table ${getStatusClass(s.status)}">${s.status || '-'}</span></td>
             <td>${recipient.name || recipient.firstName || '-'}</td>

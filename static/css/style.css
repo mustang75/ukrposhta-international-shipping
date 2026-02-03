@@ -435,6 +435,15 @@ body {
     color: #1a5276;
 }
 
+.barcode-link {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.barcode-link:hover {
+    color: #2980b9;
+}
+
 .status-badge {
     padding: 5px 15px;
     border-radius: 20px;
